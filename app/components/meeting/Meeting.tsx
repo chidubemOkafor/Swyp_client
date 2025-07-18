@@ -12,7 +12,6 @@ import { TPeers, useContributorsStore } from '@/app/stores/contributors/useContr
 import SideBar from './sidebar/SideBar'
 import { useFloatingEmojiStore } from '@/app/stores/emoji/useEmojiStore'
 import FloatingEmoji from '../lib/FloatingEmoji'
-import { useMakeCall } from '../lib/useMakeCall'
 import { useMeetingStore } from '@/app/stores/video/useMeeting'
 
 const Meeting = () => {
@@ -22,7 +21,6 @@ const Meeting = () => {
   const { triggerEmoji } = useFloatingEmojiStore()
   const setChat = useChatStore(state => state.setChat)
   const params = useParams()
-  const { makeCall } = useMakeCall()
   const { mediaStream } = useMeetingStore();
   
   useEffect(() => {
@@ -30,15 +28,6 @@ const Meeting = () => {
       initializeSocket(params.id as string);
       return;
     }
-
-    async function handleMakeCall() {
-      if (!socket) return
-      if(mediaStream) {
-          await makeCall(socket)
-      }
-    }
-
-    handleMakeCall()
 
     socket.emit('join-meeting');
     socket.emit('get-stream-type')
@@ -62,7 +51,6 @@ const Meeting = () => {
     const handlePeerJoined = (incomingPeer: Omit<TPeers, "videoRef">) => {
       const newPeer: TPeers = {
         ...incomingPeer,
-        videoRef: React.createRef<HTMLVideoElement>(),
       }
     
       if (newPeer && newPeer.username) {

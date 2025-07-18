@@ -6,7 +6,7 @@ import React from 'react'
 type StreamType = 'video' | 'screenrecording' | null
 
 interface MeetingStore {
-  mediaStream: MediaStream | null,
+  mediaStream: MediaStream ,
   remoteStream: MediaStream | null,
   streamType: StreamType
   isAudio: boolean
@@ -28,7 +28,7 @@ export const useMeetingStore = create<MeetingStore>()(
 
     return {
       remoteStream: null,
-      mediaStream: null,
+      mediaStream: new MediaStream(),
       streamType: null,
       isAudio: false,
       videoElements: new Set(),
@@ -64,7 +64,7 @@ export const useMeetingStore = create<MeetingStore>()(
           element.srcObject = null
         })
 
-        set({ mediaStream: null, streamType: null, isAudio: false })
+        set({ mediaStream: new MediaStream(), streamType: null, isAudio: false })
         resetView()
       },
 
@@ -162,7 +162,7 @@ export const useMeetingStore = create<MeetingStore>()(
           return
         }
 
-        if (!mediaStream) {
+        if (!mediaStream.active) {
           try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
               audio: true, 

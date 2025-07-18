@@ -6,7 +6,6 @@ export type TPeers = {
     role: string,
     userId: string
     username: string,
-    videoRef: React.RefObject<HTMLVideoElement | null>
   }
 
 interface IContributors {

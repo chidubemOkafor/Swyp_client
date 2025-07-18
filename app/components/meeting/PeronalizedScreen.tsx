@@ -14,18 +14,21 @@ import { useHandStore } from '@/app/stores/tab/useHandStore';
 import { IoHandRightOutline } from 'react-icons/io5';
 import { useFloatingEmojiStore } from '@/app/stores/emoji/useEmojiStore';
 import { trimYou } from '@/app/util/trimYou';
-import { useMakeCall } from '../lib/useMakeCall';
+import TalkingIcon from '../lib/buuble_face/BuubleFace';
+import VoiceWave from '../lib/buuble_face/VoiceWave';
+import { IoMdMicOff } from 'react-icons/io';
+import { useMediaSoup } from '../lib/transportLogic';
 
 export default function VideoConferenceLayout() {
   const { peers, setPeers } = useContributorsStore();
   const { socket, initializeSocket } = useSocketStore()
   const { isHand, handRaisedArray, setHandRaisedArray } = useHandStore()
   const { floating } = useFloatingEmojiStore()
-  const { remoteStreamRef } = useMakeCall()
+  const isInitiator = peers.length > 1 && peers[0].isYou;
   const params = useParams()
+  useMediaSoup()
   
   const videoRef = useVideoElement() 
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
   
   const {
     mediaStream,
@@ -33,10 +36,10 @@ export default function VideoConferenceLayout() {
     isAudio,
   } = useMeetingStore();
 
-  const gridCols =
-    peers.length <= 2 ? 'grid-cols-1' :
-    peers.length <= 4 ? 'grid-cols-2' :
-    'grid-cols-3';
+  // const gridCols =
+  //   peers.length <= 2 ? 'grid-cols-1' :
+  //   peers.length <= 4 ? 'grid-cols-2' :
+  //   'grid-cols-3';
 
   function handlePin(index: number) {
     const pinnedPeer = peers[index];
@@ -46,9 +49,12 @@ export default function VideoConferenceLayout() {
 
   useEffect(() => {
     if (!socket) {
-      initializeSocket(params.id as string);
-      return;
+        initializeSocket(params.id as string);
     }
+  }, [socket, initializeSocket, params.id]);
+
+  useEffect(() => {
+    if (!socket) return;
 
     const handleHandDroppedArray = ({ handRaisedArray }:{ handRaisedArray: string[] }) => setHandRaisedArray(handRaisedArray)
 
@@ -62,12 +68,6 @@ export default function VideoConferenceLayout() {
 
   }, [socket, initializeSocket, isHand ])
 
-   useEffect(() => {
-    if (remoteVideoRef.current && remoteStreamRef.current) {
-        remoteVideoRef.current.srcObject = remoteStreamRef.current;
-    }
-  }, [remoteStreamRef, remoteVideoRef]);
-
   useEffect(() => {
     if (videoRef.current && mediaStream) {
       videoRef.current.srcObject = mediaStream;
@@ -78,7 +78,7 @@ export default function VideoConferenceLayout() {
 
   return (
     <div className="flex flex-col md:flex-row gap-4 h-[77vh] w-full p-4 bg-neutral-900 rounded-md justify-center">
-        <div className="relative aspect-video bg-neutral-800 rounded-md overflow-hidden shadow-lg">
+      <div className="relative aspect-video bg-neutral-800 rounded-md overflow-hidden shadow-lg">
           {(streamType === 'video' || streamType === 'screenrecording') && mediaStream ? (
             <video
               ref={videoRef}
@@ -88,15 +88,8 @@ export default function VideoConferenceLayout() {
               className="aspect-video h-full object-cover"
             />
           ) : (
-            <div className="h-full flex items-center justify-center text-gray-400">
-              {isAudio ? (
-                <div className="flex flex-col items-center">
-                  <Icon />
-                  <p className="text-sm mt-2">🎤 Audio Only</p>
-                </div>
-              ) : (
-                <Icon />
-              )}
+            <div className={`h-full flex items-center justify-center text-gray-400  ${isAudio && 'border-4 border-blue-600 animate-pulse border-opacity-20'}`}>
+              <Icon />
             </div>
           )}
           {handleEmojiDisplay(peers[0]?.username || "You") && <div className='absolute top-2 left-2 bg-neutral-700 px-2 py-1 rounded'>
@@ -105,47 +98,49 @@ export default function VideoConferenceLayout() {
           <div className="absolute left-2 bottom-2 text-white text-xs bg-neutral-700 px-2 py-1 rounded">
             {peers[0]?.username || 'You'}
           </div>
-          {handRaisedArray.includes(peers[0]?.userId as never) && <div className='absolute right-2 bottom-2 bg-neutral-700 p-2 rounded-md'>
+          <div className='flex items-center space-x-2 absolute right-2 bottom-2'>
+          {isAudio ? <VoiceWave/>: <div className=' bg-neutral-700 p-2 rounded-md'>
+            <IoMdMicOff className='size-4 rounded-md text-white'/>
+          </div>}
+          {handRaisedArray.includes(peers[0]?.userId as never) && <div className=' bg-neutral-700 p-2 rounded-md'>
             <IoHandRightOutline className='size-4 rounded-md text-white'/>
           </div>}
-        </div>
-        <div className="flex md:flex-col flex-row flex-wrap gap-3 overflow-auto md:max-w-[300px] max-h-[100%]">
-          {peers.slice(1).map((peer, i) => (
-      <div
-        key={peer.userId}
-        className="relative bg-neutral-800 aspect-video w-[300px] rounded-md flex items-center justify-center shadow-sm"
-      >
-        <video
-          autoPlay
-          playsInline
-          muted={false}
-          ref={(el) => {
-            videoRef.current[peer.userId] = el;
-            if (el && remoteStreamRef.current) {
-              el.srcObject = remoteStreamRef.current; // for now, only one stream
-            }
-          }}
-          className="absolute w-full h-full object-cover"
-        />
-
-        <Jazzicon diameter={64} seed={parseInt(peer.userId)} />
-
-        {handleEmojiDisplay(peer.username) && (
-          <div className='absolute top-2 left-2 bg-neutral-700 px-2 py-1 rounded'>
-            {handleEmojiDisplay(peer.username)?.emoji}
           </div>
-        )}
-        <div className="absolute left-2 bottom-2 text-white text-xs bg-neutral-700 px-2 py-1 rounded">
-          {peer.username}
-        </div>
-        {handRaisedArray.includes(peer.userId as never) && (
-          <div className='absolute right-2 bottom-2 bg-neutral-700 p-2 rounded-md'>
-            <IoHandRightOutline className='size-4 rounded-md text-white'/>
-          </div>
-        )}
       </div>
-    ))}
+    <div className="flex md:flex-col flex-row flex-wrap gap-3 overflow-auto max-h-full">
+  {peers.slice(1).map((peer, i) => (
+    <div
+      key={peer.userId}
+      className="relative w-[300px] h-[180px] bg-neutral-800 rounded-md overflow-hidden shadow-md"
+    >
+      <video
+        autoPlay
+        playsInline
+        muted={false}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Optional UI overlays */}
+      <Jazzicon diameter={48} seed={parseInt(peer.userId)} />
+
+      {handleEmojiDisplay(peer.username) && (
+        <div className='absolute top-2 left-2 bg-neutral-700 px-2 py-1 rounded z-10'>
+          {handleEmojiDisplay(peer.username)?.emoji}
+        </div>
+      )}
+
+      <div className="absolute left-2 bottom-2 text-white text-xs bg-neutral-700 px-2 py-1 rounded z-10">
+        {peer.username}
+      </div>
+
+      {handRaisedArray.includes(peer.userId as never) && (
+        <div className='absolute right-2 bottom-2 bg-neutral-700 p-2 rounded-md z-10'>
+          <IoHandRightOutline className='size-4 text-white' />
+        </div>
+      )}
     </div>
+  ))}
+  </div>
   </div>
   );
 }
