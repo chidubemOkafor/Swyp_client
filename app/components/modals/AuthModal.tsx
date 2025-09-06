@@ -19,12 +19,12 @@ function AuthModal() {
     setOpen(null)
   });
 
-  const tabActive = 'bg-blue-500  rounded-4xl w-[49%] cursor-pointer'
-  const tabNotActive = 'bg-gray-700 rounded-4xl w-[49%] hover:bg-gray-800 cursor-pointer'
+  const tabActive = 'bg-amber-400 text-black rounded-md py-3 w-full font-bold cursor-pointer'
+  const tabNotActive = 'bg-neutral-700 rounded-md w-full hover:bg-neutral-800 cursor-pointer'
   return (
     <Backdrop>
         <>
-        <div className="w-full p-3 rounded-md flex justify-between">
+        <div className="w-full rounded-md flex justify-between gap-5">
           <button
             className={tb === 'SignUp' ? tabActive : tabNotActive}
             onClick={() => setTb('SignUp')}

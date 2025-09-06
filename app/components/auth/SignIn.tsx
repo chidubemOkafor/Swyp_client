@@ -33,7 +33,7 @@ function SignIn() {
                     <input
                         type="text"
                         placeholder="username"
-                        className="border border-gray-800 outline-none w-full h-10 pl-5 rounded-4xl"
+                        className="bg-neutral-800/30 outline-none w-full h-10 pl-5 rounded-md"
                         required
                         {...formik.getFieldProps('username')}
                     />
@@ -46,7 +46,7 @@ function SignIn() {
                 <input
                     type="password"
                     placeholder="password"
-                    className="border border-gray-800 outline-none w-full h-10 pl-5 rounded-4xl"
+                    className="bg-neutral-800/30 outline-none w-full h-10 pl-5 rounded-md"
                     required
                     {...formik.getFieldProps('password')}
                 />
@@ -54,9 +54,9 @@ function SignIn() {
                     <span className={errortext}>{formik.errors.password}</span>
                 ) : null}
                 </div>
-                <button type='submit' className={` w-full rounded-4xl py-2 ${!isLoading ? 'cursor-pointer bg-gray-500' : 'cursor-progress bg-gray-400'}`} disabled={isLoading}>
-                Continue
-            </button>
+                <button type='submit' className={` w-full rounded-md py-3 text-black font-bold ${!isLoading ? 'cursor-pointer bg-amber-400' : 'cursor-progress bg-amber-400/30'}`} disabled={isLoading}>
+                  Continue
+                </button>
             </form>
         )}
     </Formik>

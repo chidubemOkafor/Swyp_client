@@ -26,7 +26,7 @@ export default function VideoConferenceLayout() {
   const { floating } = useFloatingEmojiStore()
   const isInitiator = peers.length > 1 && peers[0].isYou;
   const params = useParams()
-  useMediaSoup()
+  const { remoteVideoRef } = useMediaSoup()
   
   const videoRef = useVideoElement() 
   
@@ -78,6 +78,7 @@ export default function VideoConferenceLayout() {
 
   return (
     <div className="flex flex-col md:flex-row gap-4 h-[77vh] w-full p-4 bg-neutral-900 rounded-md justify-center">
+      
       <div className="relative aspect-video bg-neutral-800 rounded-md overflow-hidden shadow-lg">
           {(streamType === 'video' || streamType === 'screenrecording') && mediaStream ? (
             <video
@@ -98,6 +99,7 @@ export default function VideoConferenceLayout() {
           <div className="absolute left-2 bottom-2 text-white text-xs bg-neutral-700 px-2 py-1 rounded">
             {peers[0]?.username || 'You'}
           </div>
+          {/* <button className="absolute bottom-2 left-26 bg-red-600 py-2 px-10 rounded-md cursor-pointer" onClick={produce}>produce</button> */}
           <div className='flex items-center space-x-2 absolute right-2 bottom-2'>
           {isAudio ? <VoiceWave/>: <div className=' bg-neutral-700 p-2 rounded-md'>
             <IoMdMicOff className='size-4 rounded-md text-white'/>
@@ -108,9 +110,8 @@ export default function VideoConferenceLayout() {
           </div>
       </div>
     <div className="flex md:flex-col flex-row flex-wrap gap-3 overflow-auto max-h-full">
-  {peers.slice(1).map((peer, i) => (
+  {/* {peers.slice(1).map((peer, i) => ( */}
     <div
-      key={peer.userId}
       className="relative w-[300px] h-[180px] bg-neutral-800 rounded-md overflow-hidden shadow-md"
     >
       <video
@@ -118,28 +119,30 @@ export default function VideoConferenceLayout() {
         playsInline
         muted={false}
         className="w-full h-full object-cover"
+        ref={ remoteVideoRef }
       />
 
       {/* Optional UI overlays */}
-      <Jazzicon diameter={48} seed={parseInt(peer.userId)} />
+      <Jazzicon diameter={48} seed={parseInt(peers[1]?.userId)} />
 
-      {handleEmojiDisplay(peer.username) && (
+      {handleEmojiDisplay(peers[1]?.username) && (
         <div className='absolute top-2 left-2 bg-neutral-700 px-2 py-1 rounded z-10'>
-          {handleEmojiDisplay(peer.username)?.emoji}
+          {handleEmojiDisplay(peers[1]?.username)?.emoji}
         </div>
       )}
 
       <div className="absolute left-2 bottom-2 text-white text-xs bg-neutral-700 px-2 py-1 rounded z-10">
-        {peer.username}
+        {peers[1]?.username}
       </div>
 
-      {handRaisedArray.includes(peer.userId as never) && (
+      {handRaisedArray.includes(peers[1]?.userId as never) && (
         <div className='absolute right-2 bottom-2 bg-neutral-700 p-2 rounded-md z-10'>
           <IoHandRightOutline className='size-4 text-white' />
         </div>
       )}
     </div>
-  ))}
+    {/* <button className='bg-red-600 py-2 rounded-md cursor-pointer'onClick={consume}>consume</button> */}
+  {/* ))} */}
   </div>
   </div>
   );

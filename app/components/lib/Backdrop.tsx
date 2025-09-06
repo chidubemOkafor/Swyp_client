@@ -3,7 +3,22 @@ import React, { useRef } from 'react'
 import { IoIosCloseCircle } from 'react-icons/io';
 import { useClickAway } from 'react-use';
 
-function Backdrop({children}: Readonly<{ children?: React.ReactNode}>) {
+type IcontextProp = 'no-backdrop'
+
+function Backdrop({children, className = "w-[30em]", title = "", contextProps = [] }: 
+  { 
+    children?: React.ReactNode, 
+    className?: string, 
+    title?: string,
+    contextProps?: Array<IcontextProp>
+  }
+  ) {
+
+    let isBackDrop = 'backdrop-blur-sm'
+    if(contextProps.includes('no-backdrop')) {
+      isBackDrop = ''
+    }
+
     const { setOpen } = useToggle()
     const authModalRef = useRef<HTMLDivElement | null>(null)
 
@@ -12,11 +27,12 @@ function Backdrop({children}: Readonly<{ children?: React.ReactNode}>) {
     });
     //bg-[#202020]
   return (
-    <div className="backdrop-blur-sm fixed inset-0 flex items-center justify-center z-20">
+    <div className={`fixed inset-0 flex items-center justify-center z-2 ${isBackDrop}`}>
     <div 
       ref = {authModalRef}
-    className="bg-neutral-800 rounded-md shadow-xl p-5 space-y-5 w-[30em]">
-        <div className='flex justify-end'>
+    className={`bg-neutral-900 rounded-md shadow-xl p-5 space-y-5 ${className}`}>
+        <div className='flex justify-between'>
+          <p className='text-3xl font-bold'>{title}</p>
           <button className='cursor-pointer' onClick={() => setOpen(null)}>
             <IoIosCloseCircle className='size-5'/>
           </button>

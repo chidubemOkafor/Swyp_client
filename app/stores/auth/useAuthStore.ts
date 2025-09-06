@@ -61,6 +61,7 @@ async function SignIn({ username, password}: IPayload) {
         if (response.status === 201) {
             cookieStore.set('jsonwebtoken', response.data.jwt)
             cookieStore.set('username', response.data.username)
+            cookieStore.set('userId', response.data.userId)
         }
         toast.success("logged in successfully")
         useToggle.getState().setOpen(null)
@@ -94,6 +95,14 @@ export async function getUsername() {
         return username.value
     }
     return "no username"
+}
+
+export async function getUserId() {
+    const userId = await cookieStore.get("userId")
+    if(userId && userId.value) {
+        return userId.value
+    }
+    return "no userId"
 }
 
 export async function getJwt() {

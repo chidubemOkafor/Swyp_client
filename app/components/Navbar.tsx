@@ -7,10 +7,13 @@ import { isLoggedIn } from '../stores/auth/useAuthStore'
 import { getSetting } from './lib/settings'
 import Jazzicon from 'react-jazzicon'
 import { getUsername } from '../stores/auth/useAuthStore'
+import MeetingId from './modals/MeetingId'
+import { useParams } from 'next/navigation'
 
 function Navbar() {
     const { setOpen,setIsLogIn } = useToggle()
     const { logOut, isLggedIn } = useAuth()
+    const params = useParams()
     
     const [ islog, setIsLog ] = useState(false)
     const [ jazId, setJazId ] = useState("")
@@ -53,8 +56,12 @@ function Navbar() {
     
   return (
     <nav className=' flex justify-between py-5 px-10'>
-        <span>{" "}</span>
+           <div className='flex items-center gap-3'>
+                <p><b>Meeting ID:</b></p>
+                <MeetingId meetingId={params.id as string}/>
+            </div>
         <div className='p-3 rounded-4xl flex justify-between items-center space-x-2'>
+         
            {islog && <div className='flex gap-2'>
                 <Jazzicon diameter={25} seed={parseInt(jazId)}/>
                 <span>{username}</span>

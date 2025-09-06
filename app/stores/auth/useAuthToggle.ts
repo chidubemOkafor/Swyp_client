@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-type modals = "auth" | "meeting" | "meeting_link" | "settings" | null
+type modals = "auth" | "meeting" | "meeting_link" | "settings" | "schedule" | null
 interface IAuthToggle {
   open: modals
   setOpen: (value: modals) => void,

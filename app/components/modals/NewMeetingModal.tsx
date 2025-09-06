@@ -7,6 +7,7 @@ import useToggle from '@/app/stores/auth/useAuthToggle';
 import { initial } from '@/app/util/instantMeeting';
 import { useMeeting } from '@/app/stores/meeting/useMeetingStore';
 import { useRouter } from 'next/navigation';
+import Button from '../ui/Button';
 
 
 function NewMeetingModal() {
@@ -24,14 +25,16 @@ function NewMeetingModal() {
   return (
     <Backdrop>
         <div className='flex flex-col space-y-5 text-start'>
-            <button className={buttonStyle} onClick={() => setOpen("meeting_link")}>
+            <Button onClick={() => setOpen("schedule")}> 
+                {/* 
+            meeting_link */}
                 <PiLinkSimpleHorizontal className='size-5'/>
-                <p>Create a meeting for later</p>
-            </button>
-            <button className={buttonStyle} onClick={handleNavigate}>
+                <p>Schedule a Meeting</p>
+            </Button>
+            <Button onClick={handleNavigate}>
                 <IoAddCircleOutline className='size-5'/>
                 <p>Start an instant meeting</p>
-            </button>
+            </Button>
             <div className={`justify-between ${buttonStyle}`}>
                 <div className='flex gap-5'>
                     <RiUser4Line className='size-5'/>
